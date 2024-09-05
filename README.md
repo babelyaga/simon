@@ -25,9 +25,13 @@ This is a simple JavaScript and HTML/CSS game application made for practicing va
   - Very fast: 150 ms (used for the final levels)
 - As the game progresses, the sequence display speed increases and the game difficulty increases.
 
+## Setup
+
+-Download or clone the repository and run the index.html file.
+
 ## How to play
 
-1. once the game load click the “Start Game” button to begin the game.
+1. Once the game load click the “Start Game” button to begin the game.
 2. Wait for the sequence to finish.
 3. Repeat the sequence displayed.
 4. Use the “Repeat” button if you need help (once per game).
@@ -45,9 +49,6 @@ This is a simple JavaScript and HTML/CSS game application made for practicing va
 
 ## Technical Details
 
-- This game is made with JavaScript and HTML/CSS.
-- The game uses CSS animations and transitions to create visual effects.
-- HTML elements are used for the user interface.
 - The game is built using modular functions and objects to manage game state and UI.
 - Uses a simple game loop to manage game flow.
 - UX considerations: The game is designed to be as easy to use as possible, with clear, intuitive controls and a simple, visually appealing interface. The game difficulty increases gradually, allowing players to become accustomed to the pace and mechanics of the game.
