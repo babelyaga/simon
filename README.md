@@ -22,7 +22,7 @@ This is a simple JavaScript and HTML/CSS game application made for practicing va
   - Default: 550 ms (used for the first few levels)
   - Medium: 350 ms (used for intermediate levels)
   - Fast: 250 ms (used for higher levels)
-  - Very fast: 150 ms (used for the final level)
+  - Very fast: 150 ms (used for the final levels)
 - As the game progresses, the sequence display speed increases and the game difficulty increases.
 
 ## How to play
