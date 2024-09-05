@@ -1,0 +1,205 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 6px;
+  width: 100vh;
+  height: 90vh;
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+.color-button {
+  filter: brightness(20%);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, filter;
+  border: none;
+  padding: 20px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.color-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  filter: brightness(300%);
+  cursor: pointer;
+}
+
+.color-button.active {
+  opacity: 1;
+  transform: scale(1.05);
+  filter: brightness(300%);
+  pointer-events: none;
+}
+
+.red-button {
+  background-color: rgb(255, 0, 0);
+  border-radius: 100% 10px 10px 10px;
+}
+
+.green-button {
+  background-color: rgb(0, 255, 0);
+  border-radius: 10px 100% 10px 10px;
+}
+
+.blue-button {
+  background-color: rgb(0, 0, 255);
+  border-radius: 10px 10px 10px 100%;
+}
+
+.yellow-button {
+  background-color: rgb(255, 255, 0);
+  border-radius: 10px 10px 100% 10px;
+}
+
+.grayed-out {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.reset-button {
+  transition: transform 0.1s ease-in-out;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 8px 8px;
+  color: #000000;
+  background-color: #ffffff;
+  font-size: medium;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-family: "Times New Roman", serif;
+}
+
+.reset-button:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.reset-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.reset-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.black-and-white-button {
+  transition: transform 0.1s ease-in-out;
+  position: absolute;
+  bottom: 50px;
+  left: 10px;
+  padding: 8px 8px;
+  color: #000000;
+  background-color: #ffffff;
+  font-size: medium;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-family: "Times New Roman", serif;
+}
+
+.black-and-white-button:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.black-and-white-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.start-button {
+  transition: transform 0.1s ease-in-out;
+  position: absolute;
+  bottom: 90px;
+  left: 10px;
+  padding: 8px 8px;
+  color: #000000;
+  background-color: #ffffff;
+  font-size: medium;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-family: "Times New Roman", serif;
+}
+
+.start-button:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.color-button:active,
+.reset-button:active,
+.black-and-white-button:active,
+.start-button:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.correct,
+.incorrect,
+.message {
+  font-size: large;
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.repeat-button {
+  transition: transform 0.1s ease-in-out;
+  position: absolute;
+  bottom: 130px;
+  left: 10px;
+  padding: 8px 8px;
+  color: #000000;
+  background-color: #ffffff;
+  font-size: medium;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  font-family: "Times New Roman", serif;
+}
+
+.repeat-button:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.repeat-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.repeat-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
