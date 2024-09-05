@@ -24,6 +24,26 @@ repeatButton.textContent = "Repeat";
 repeatButton.addEventListener("click", repeatSequence);
 
 // Game Configuration
+const soundMap = {
+  red: "red.mp3",
+  green: "green.mp3",
+  blue: "blue.mp3",
+  yellow: "yellow.mp3",
+};
+
+// Add event listener to each button
+colorButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    // Get the button color from the class name or data attribute
+    const color = button.getAttribute("data-color");
+    // Get the sound file path from the sound map
+    const soundFilePath = soundMap[color];
+    // Play the sound
+    const sound = new Audio(soundFilePath);
+    sound.play();
+  });
+});
+
 const COLORS = ["red", "green", "blue", "yellow"];
 const MAX_LEVEL = 100;
 const TIMEOUTS = {
@@ -50,11 +70,11 @@ function initializeGame() {
 }
 
 function startGame() {
-  if (gameState.currentLevel === 1) {
+  if (gameState.sequence.length === 0) {
     generateSequence();
-    startButton.removeEventListener("click", startGame);
-  } else {
     startButton.disabled = true;
+    repeatButton.disabled = false;
+    gameState.repeatUsed = false;
   }
 }
 
@@ -97,28 +117,38 @@ function resetGameState() {
 }
 
 function repeatSequence() {
+  // Check if the game is over, the sequence is empty, or the repeat was already used
   if (
     gameState.isGameOver ||
     gameState.sequence.length === 0 ||
     gameState.repeatUsed
   ) {
+    repeatButton.disabled = true;
     showMessage("Can't Repeat 😞", "message");
     return;
   }
 
+  // Disable color buttons and reset button while sequence is being displayed
   colorButtons.forEach((button) => (button.disabled = true));
-  repeatButton.disabled = true;
   resetButton.disabled = true;
 
+  // Display the sequence to the player
   displaySequence();
 
+  // Re-enable buttons after the sequence is displayed
   setTimeout(() => {
     colorButtons.forEach((button) => (button.disabled = false));
-    repeatButton.disabled = false;
     resetButton.disabled = false;
+
+    // Do not re-enable the repeat button since it's only allowed once per game
+    // No need to reset repeatButton.disabled to false here
   }, gameState.sequence.length * getTimeoutForCurrentLevel() * 2);
 
+  // Mark that the repeat has been used
   gameState.repeatUsed = true;
+
+  // Disable the repeat button permanently for the rest of the game
+  repeatButton.disabled = true;
 }
 
 function updateUI() {
@@ -135,17 +165,21 @@ function generateSequence() {
 }
 
 function displaySequence() {
+  gameState.sequenceIsRunning = true;
   const timeout = getTimeoutForCurrentLevel();
-  console.log(
-    `Level ${gameState.currentLevel} sequence: ${gameState.sequence.join(", ")}`
-  );
   gameState.sequence.forEach((color, index) => {
     setTimeout(() => flashButton(color), index * timeout * 2);
   });
   setTimeout(() => {
-    gameState.playerInput = [];
-    clearMessage();
-    resetButton.disabled = false;
+    setTimeout(() => {
+      gameState.sequenceIsRunning = false;
+      gameState.playerInput = [];
+      clearMessage();
+      resetButton.disabled = false;
+      colorButtons.forEach((button) => {
+        button.disabled = false;
+      });
+    }, 500);
   }, gameState.sequence.length * timeout * 2);
 }
 
@@ -247,6 +281,9 @@ function clearMessage() {
 function flashButton(color) {
   const button = document.querySelector(`.color-button[data-color="${color}"]`);
   button.classList.add("active");
+  const soundFilePath = soundMap[color];
+  const sound = new Audio(soundFilePath);
+  sound.play();
   setTimeout(
     () => button.classList.remove("active"),
     getTimeoutForCurrentLevel()
@@ -255,7 +292,10 @@ function flashButton(color) {
 
 function setupEventListeners() {
   colorButtons.forEach((button) => {
-    button.addEventListener("click", () => playRound(button.dataset.color));
+    button.addEventListener("click", () => {
+      if (gameState.sequenceIsRunning) return;
+      playRound(button.dataset.color);
+    });
   });
 
   resetButton.textContent = "Reset Game";

@@ -36,7 +36,6 @@
   opacity: 1;
   transform: scale(1.05);
   filter: brightness(300%);
-  pointer-events: none;
 }
 
 .red-button {

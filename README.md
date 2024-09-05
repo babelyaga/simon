@@ -32,7 +32,7 @@ This is a simple JavaScript and HTML/CSS game application made for practicing va
 ## How to play
 
 1. Once the game load click the “Start Game” button to begin the game.
-2. Wait for the sequence to finish.
+2. Wait for the sequence to finish (Patched, you can click while the sequence is running but no input would be recorded).
 3. Repeat the sequence displayed.
 4. Use the “Repeat” button if you need help (once per game).
 
