@@ -6,6 +6,7 @@ const levelElement = createElement("div", "level", {
   top: "10px",
   right: "10px",
   textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)",
+  fontSize: "30px",
 });
 const resetButton = createElement("button", "reset-button");
 const blackAndWhiteButton = createElement("button", "black-and-white-button");

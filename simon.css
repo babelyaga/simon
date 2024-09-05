@@ -8,8 +8,8 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 6px;
-  width: 100vh;
+  grid-gap: 12px;
+  width: 90vh;
   height: 90vh;
   justify-items: stretch;
   align-items: stretch;
@@ -41,22 +41,22 @@
 
 .red-button {
   background-color: rgb(255, 0, 0);
-  border-radius: 100% 10px 10px 10px;
+  border-radius: 100% 20px 20px 20px;
 }
 
 .green-button {
   background-color: rgb(0, 255, 0);
-  border-radius: 10px 100% 10px 10px;
+  border-radius: 20px 100% 20px 20px;
 }
 
 .blue-button {
   background-color: rgb(0, 0, 255);
-  border-radius: 10px 10px 10px 100%;
+  border-radius: 20px 20px 20px 100%;
 }
 
 .yellow-button {
   background-color: rgb(255, 255, 0);
-  border-radius: 10px 10px 100% 10px;
+  border-radius: 20px 20px 100% 20px;
 }
 
 .grayed-out {
@@ -72,7 +72,7 @@
   padding: 8px 8px;
   color: #000000;
   background-color: #ffffff;
-  font-size: medium;
+  font-size: 30px;
   border: none;
   border-radius: 15px;
   cursor: pointer;
@@ -99,12 +99,12 @@
 .black-and-white-button {
   transition: transform 0.1s ease-in-out;
   position: absolute;
-  bottom: 50px;
+  bottom: 70px;
   left: 10px;
   padding: 8px 8px;
   color: #000000;
   background-color: #ffffff;
-  font-size: medium;
+  font-size: 30px;
   border: none;
   border-radius: 15px;
   cursor: pointer;
@@ -127,12 +127,12 @@
 .start-button {
   transition: transform 0.1s ease-in-out;
   position: absolute;
-  bottom: 90px;
+  bottom: 190px;
   left: 10px;
   padding: 8px 8px;
   color: #000000;
   background-color: #ffffff;
-  font-size: medium;
+  font-size: 30px;
   border: none;
   border-radius: 15px;
   cursor: pointer;
@@ -164,9 +164,9 @@
 .correct,
 .incorrect,
 .message {
-  font-size: large;
+  font-size: 30px;
   position: absolute;
-  top: 50%;
+  bottom: 210px;
   right: 10px;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -180,7 +180,7 @@
   padding: 8px 8px;
   color: #000000;
   background-color: #ffffff;
-  font-size: medium;
+  font-size: 30px;
   border: none;
   border-radius: 15px;
   cursor: pointer;
