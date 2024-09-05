@@ -27,7 +27,7 @@ This is a simple JavaScript and HTML/CSS game application made for practicing va
 
 ## Setup
 
--Download or clone the repository and run the index.html file.
+- Download or clone the repository and run the index.html file.
 
 ## How to play
 
