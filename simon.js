@@ -117,7 +117,6 @@ function resetGameState() {
 }
 
 function repeatSequence() {
-  // Check if the game is over, the sequence is empty, or the repeat was already used
   if (
     gameState.isGameOver ||
     gameState.sequence.length === 0 ||
@@ -128,26 +127,18 @@ function repeatSequence() {
     return;
   }
 
-  // Disable color buttons and reset button while sequence is being displayed
   colorButtons.forEach((button) => (button.disabled = true));
   resetButton.disabled = true;
 
-  // Display the sequence to the player
   displaySequence();
 
-  // Re-enable buttons after the sequence is displayed
   setTimeout(() => {
     colorButtons.forEach((button) => (button.disabled = false));
     resetButton.disabled = false;
-
-    // Do not re-enable the repeat button since it's only allowed once per game
-    // No need to reset repeatButton.disabled to false here
   }, gameState.sequence.length * getTimeoutForCurrentLevel() * 2);
 
-  // Mark that the repeat has been used
   gameState.repeatUsed = true;
 
-  // Disable the repeat button permanently for the rest of the game
   repeatButton.disabled = true;
 }
 
