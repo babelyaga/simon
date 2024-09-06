@@ -27,8 +27,8 @@
 
 .color-button:hover {
   opacity: 1;
-  transform: scale(1.05);
-  filter: brightness(300%);
+  transform: scale(1.02);
+  filter: brightness(200%);
   cursor: pointer;
 }
 
@@ -36,6 +36,13 @@
   opacity: 1;
   transform: scale(1.05);
   filter: brightness(300%);
+}
+
+.color-button.active:hover {
+  opacity: 1;
+  transform: scale(1.06);
+  filter: brightness(350%);
+  cursor: pointer;
 }
 
 .red-button {
@@ -82,11 +89,7 @@
 }
 
 .reset-button:hover {
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
   transform: scale(1.05);
-}
-
-.reset-button:hover:not(:disabled) {
   background-color: #e0e0e0;
 }
 
@@ -114,8 +117,7 @@
 }
 
 .black-and-white-button:hover {
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .black-and-white-button:disabled {
@@ -165,10 +167,11 @@
 .message {
   font-size: 30px;
   position: absolute;
-  bottom: 210px;
+  top: 50%;
   right: 10px;
   text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: "Times New Roman", serif;
 }
 
 .repeat-button {
@@ -201,4 +204,62 @@
 .repeat-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* .gif-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 50vh;
+  animation: fadeIn 2s, bounce 1s infinite;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+} */
+
+#leaderboard {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 30px;
+  font-family: "Times New Roman", serif;
+  text-align: left;
+  color: #333;
+}
+
+#leaderboard ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#leaderboard ul li {
+  font-size: 20px;
+  margin: 10px 0;
+  padding: 5px;
+  background-color: transparent;
+  color: #444;
+  transition: color 0.3s ease;
+}
+
+#leaderboard ul li:hover {
+  color: #000;
 }

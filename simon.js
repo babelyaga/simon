@@ -31,21 +31,17 @@ const soundMap = {
   yellow: "yellow.mp3",
 };
 
-// Add event listener to each button
 colorButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    // Get the button color from the class name or data attribute
     const color = button.getAttribute("data-color");
-    // Get the sound file path from the sound map
     const soundFilePath = soundMap[color];
-    // Play the sound
     const sound = new Audio(soundFilePath);
     sound.play();
   });
 });
 
 const COLORS = ["red", "green", "blue", "yellow"];
-const MAX_LEVEL = 100;
+const MAX_LEVEL = 50;
 const TIMEOUTS = {
   DEFAULT: 550,
   MEDIUM: 350,
@@ -67,14 +63,32 @@ function initializeGame() {
   resetGameState();
   updateUI();
   setupEventListeners();
+  updateLeaderboard();
+
+  colorButtons.forEach((button) => {
+    button.disabled = true;
+  });
 }
 
 function startGame() {
+  let nickname = sessionStorage.getItem("nickname");
+
+  if (!nickname) {
+    nickname = prompt("Enter your nickname (max 10 characters):");
+    if (nickname) {
+      nickname = nickname.trim().substring(0, 10);
+      sessionStorage.setItem("nickname", nickname);
+    } else {
+      return;
+    }
+  }
+
   if (gameState.sequence.length === 0) {
     generateSequence();
     startButton.disabled = true;
     repeatButton.disabled = false;
     gameState.repeatUsed = false;
+    startButton.remove();
   }
 }
 
@@ -98,6 +112,7 @@ function resetGame() {
   repeatButton.disabled = false;
   resetButton.disabled = true;
   gameState.repeatUsed = false;
+  startButton.remove();
 }
 
 // Helper Functions
@@ -123,7 +138,6 @@ function repeatSequence() {
     gameState.repeatUsed
   ) {
     repeatButton.disabled = true;
-    showMessage("Can't Repeat 😞", "message");
     return;
   }
 
@@ -135,11 +149,10 @@ function repeatSequence() {
   setTimeout(() => {
     colorButtons.forEach((button) => (button.disabled = false));
     resetButton.disabled = false;
+
+    gameState.repeatUsed = true;
+    repeatButton.disabled = true;
   }, gameState.sequence.length * getTimeoutForCurrentLevel() * 2);
-
-  gameState.repeatUsed = true;
-
-  repeatButton.disabled = true;
 }
 
 function updateUI() {
@@ -170,7 +183,8 @@ function displaySequence() {
       colorButtons.forEach((button) => {
         button.disabled = false;
       });
-    }, 500);
+      showMessage("Your turn!", "message");
+    }, 300);
   }, gameState.sequence.length * timeout * 2);
 }
 
@@ -188,6 +202,13 @@ function handleCorrectInput() {
     }
   }
 }
+
+// function displayGif() {
+//   const gif = document.createElement("img");
+//   gif.src = "gif1.gif";
+//   gif.classList.add("gif-animation");
+//   document.body.appendChild(gif);
+// }
 
 function handleIncorrectInput() {
   showMessage("Incorrect!", "incorrect");
@@ -213,14 +234,18 @@ function endGame(isWin) {
     button.disabled = true;
     if (!isWin) button.classList.add("grayed-out");
   });
+  startButton.remove();
   repeatButton.disabled = true;
-  startButton.disabled = true;
   blackAndWhiteButton.disabled = true;
   showMessage(
-    isWin ? "Congratulations! You are a robot." : "Game Over!",
+    isWin ? "Congratulations, you're a robot!" : "Game Over!",
     isWin ? "win" : "game-over"
   );
   resetButton.textContent = "Try Again";
+  updateLeaderboard();
+  // if (isWin) {
+  //   displayGif();
+  // }
 }
 
 function blackAndWhite() {
@@ -232,7 +257,9 @@ function blackAndWhite() {
     button.style.backgroundColor = "gray";
   });
   blackAndWhiteButton.disabled = true;
-  startButton.disabled = true;
+  startButton.remove();
+  gameState.repeatUsed = false;
+  repeatButton.disabled = false;
 }
 
 // Utility Functions
@@ -256,7 +283,7 @@ function getTimeoutForCurrentLevel() {
 }
 
 function updateLevelElement() {
-  levelElement.textContent = `Score: ${gameState.currentLevel}`;
+  levelElement.textContent = `Stage: ${gameState.currentLevel}`;
 }
 
 function showMessage(text, className) {
@@ -279,6 +306,63 @@ function flashButton(color) {
     () => button.classList.remove("active"),
     getTimeoutForCurrentLevel()
   );
+}
+
+function updateLeaderboard() {
+  const leaderboardDiv = document.getElementById("leaderboard");
+  if (!leaderboardDiv) return;
+
+  const currentLevel = gameState.currentLevel;
+  let storedScores = JSON.parse(localStorage.getItem("scores")) || [];
+  let storedNicknames = JSON.parse(localStorage.getItem("nicknames")) || {};
+
+  storedScores = storedScores.filter(
+    (score) =>
+      typeof score.level === "number" &&
+      !isNaN(score.level) &&
+      score.date &&
+      !isNaN(new Date(score.date).getTime())
+  );
+
+  if (gameState.isGameOver) {
+    const nickname = sessionStorage.getItem("nickname");
+    storedNicknames[currentLevel] = nickname;
+    localStorage.setItem("nicknames", JSON.stringify(storedNicknames));
+
+    const newScore = {
+      level: currentLevel,
+      date: new Date().toISOString(),
+      nickname: storedNicknames[currentLevel],
+    };
+    storedScores.push(newScore);
+  }
+
+  storedScores.sort((a, b) => {
+    if (b.level !== a.level) {
+      return b.level - a.level;
+    }
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  storedScores = storedScores.slice(0, 5);
+
+  localStorage.setItem("scores", JSON.stringify(storedScores));
+
+  leaderboardDiv.innerHTML = "";
+
+  const leaderboardList = document.createElement("ul");
+
+  storedScores.forEach((score, index) => {
+    const listItem = document.createElement("li");
+    const scoreDate = new Date(score.date);
+    const formattedDate = scoreDate.toLocaleDateString();
+    listItem.textContent = `${index + 1}: Stage ${score.level} (${
+      score.nickname
+    }) - ${formattedDate}`;
+    leaderboardList.appendChild(listItem);
+  });
+
+  leaderboardDiv.appendChild(leaderboardList);
 }
 
 function setupEventListeners() {
