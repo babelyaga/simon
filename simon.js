@@ -103,16 +103,18 @@ function playRound(color) {
 }
 
 function resetGame() {
-  resetGameState();
-  updateUI();
-  clearMessage();
-  generateSequence();
-  resetButton.textContent = "Reset Game";
-  blackAndWhiteButton.disabled = false;
-  repeatButton.disabled = false;
-  resetButton.disabled = true;
-  gameState.repeatUsed = false;
-  startButton.remove();
+  resetButton.disabled = gameState.sequence.length === 0;
+  if (gameState.sequence.length > 0) {
+    resetGameState();
+    updateUI();
+    clearMessage();
+    generateSequence();
+    resetButton.textContent = "Reset Game";
+    blackAndWhiteButton.disabled = false;
+    repeatButton.disabled = false;
+    gameState.repeatUsed = false;
+    startButton.remove();
+  }
 }
 
 // Helper Functions

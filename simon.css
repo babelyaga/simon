@@ -241,9 +241,7 @@
   top: 10px;
   left: 10px;
   font-size: 30px;
-  font-family: "Times New Roman", serif;
   text-align: left;
-  color: #333;
 }
 
 #leaderboard ul {
@@ -256,10 +254,11 @@
   margin: 10px 0;
   padding: 5px;
   background-color: transparent;
-  color: #444;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 #leaderboard ul li:hover {
-  color: #000;
+  color: #1dc54d;
+  transform: scale(1.1);
 }
