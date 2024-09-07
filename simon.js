@@ -1,53 +1,45 @@
+// Game Configuration
+const GAME_CONFIG = {
+  colors: ["red", "green", "blue", "yellow"],
+  maxLevel: 50,
+  timeouts: {
+    default: 550,
+    medium: 350,
+    fast: 250,
+    veryFast: 150,
+  },
+  soundMap: {
+    red: "red.mp3",
+    green: "green.mp3",
+    blue: "blue.mp3",
+    yellow: "yellow.mp3",
+  },
+};
+
 // DOM Elements
 const colorButtons = document.querySelectorAll(".color-button");
 const messageElement = createElement("div", "message");
-const levelElement = createElement("div", "level", {
-  position: "absolute",
-  top: "10px",
-  right: "10px",
-  textShadow: "2px 2px 4px rgba(0, 0, 0, 0.2)",
-  fontSize: "30px",
-});
+const levelElement = createElement("div", "level");
 const resetButton = createElement("button", "reset-button");
 const blackAndWhiteButton = createElement("button", "black-and-white-button");
 const startButton = createElement("button", "start-button");
 const repeatButton = createElement("button", "repeat-button");
 
 // Initial Setup
-blackAndWhiteButton.textContent = "Black and White";
-blackAndWhiteButton.addEventListener("click", blackAndWhite);
+const buttons = [
+  {
+    element: blackAndWhiteButton,
+    text: "Black and White",
+    action: blackAndWhite,
+  },
+  { element: startButton, text: "Start Game", action: startGame },
+  { element: repeatButton, text: "Repeat", action: repeatSequence },
+];
 
-startButton.textContent = "Start Game";
-startButton.addEventListener("click", startGame);
-
-repeatButton.textContent = "Repeat";
-repeatButton.addEventListener("click", repeatSequence);
-
-// Game Configuration
-const soundMap = {
-  red: "red.mp3",
-  green: "green.mp3",
-  blue: "blue.mp3",
-  yellow: "yellow.mp3",
-};
-
-colorButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const color = button.getAttribute("data-color");
-    const soundFilePath = soundMap[color];
-    const sound = new Audio(soundFilePath);
-    sound.play();
-  });
+buttons.forEach(({ element, text, action }) => {
+  element.textContent = text;
+  element.addEventListener("click", action);
 });
-
-const COLORS = ["red", "green", "blue", "yellow"];
-const MAX_LEVEL = 50;
-const TIMEOUTS = {
-  DEFAULT: 550,
-  MEDIUM: 350,
-  FAST: 250,
-  VERY_FAST: 150,
-};
 
 // Game State
 let gameState = {
@@ -56,6 +48,7 @@ let gameState = {
   playerInput: [],
   isGameOver: false,
   repeatUsed: false,
+  sequenceIsRunning: false,
 };
 
 // Main Functions
@@ -64,10 +57,7 @@ function initializeGame() {
   updateUI();
   setupEventListeners();
   updateLeaderboard();
-
-  colorButtons.forEach((button) => {
-    button.disabled = true;
-  });
+  colorButtons.forEach((button) => (button.disabled = true));
 }
 
 function startGame() {
@@ -125,6 +115,7 @@ function resetGameState() {
     playerInput: [],
     isGameOver: false,
     repeatUsed: false,
+    sequenceIsRunning: false,
   };
   colorButtons.forEach((button) => {
     button.disabled = false;
@@ -151,7 +142,6 @@ function repeatSequence() {
   setTimeout(() => {
     colorButtons.forEach((button) => (button.disabled = false));
     resetButton.disabled = false;
-
     gameState.repeatUsed = true;
     repeatButton.disabled = true;
   }, gameState.sequence.length * getTimeoutForCurrentLevel() * 2);
@@ -173,21 +163,29 @@ function generateSequence() {
 function displaySequence() {
   gameState.sequenceIsRunning = true;
   const timeout = getTimeoutForCurrentLevel();
+
+  colorButtons.forEach((button) => (button.disabled = true));
+  resetButton.disabled = true;
+  repeatButton.disabled = true;
+
+  showMessage("Follow the sequence", "message");
+
   gameState.sequence.forEach((color, index) => {
     setTimeout(() => flashButton(color), index * timeout * 2);
   });
+
+  const sequenceEndTime = gameState.sequence.length * timeout * 2 + 300;
   setTimeout(() => {
-    setTimeout(() => {
-      gameState.sequenceIsRunning = false;
-      gameState.playerInput = [];
-      clearMessage();
-      resetButton.disabled = false;
-      colorButtons.forEach((button) => {
-        button.disabled = false;
-      });
-      showMessage("Your turn!", "message");
-    }, 300);
-  }, gameState.sequence.length * timeout * 2);
+    gameState.sequenceIsRunning = false;
+    gameState.playerInput = [];
+    clearMessage();
+
+    colorButtons.forEach((button) => (button.disabled = false));
+    resetButton.disabled = false;
+    repeatButton.disabled = gameState.repeatUsed;
+
+    showMessage("Your turn!", "message");
+  }, sequenceEndTime);
 }
 
 function isCorrectColor(color) {
@@ -197,20 +195,13 @@ function isCorrectColor(color) {
 function handleCorrectInput() {
   gameState.playerInput.push(gameState.sequence[gameState.playerInput.length]);
   if (gameState.playerInput.length === gameState.sequence.length) {
-    if (gameState.currentLevel < MAX_LEVEL) {
+    if (gameState.currentLevel < GAME_CONFIG.maxLevel) {
       advanceToNextLevel();
     } else {
       endGame(true);
     }
   }
 }
-
-// function displayGif() {
-//   const gif = document.createElement("img");
-//   gif.src = "gif1.gif";
-//   gif.classList.add("gif-animation");
-//   document.body.appendChild(gif);
-// }
 
 function handleIncorrectInput() {
   showMessage("Incorrect!", "incorrect");
@@ -230,24 +221,37 @@ function advanceToNextLevel() {
   }, 1000);
 }
 
-function endGame(isWin) {
-  gameState.isGameOver = true;
+function disableButtons() {
   colorButtons.forEach((button) => {
     button.disabled = true;
-    if (!isWin) button.classList.add("grayed-out");
   });
   startButton.remove();
   repeatButton.disabled = true;
   blackAndWhiteButton.disabled = true;
+}
+
+function updateUIAfterGameEnd(isWin) {
+  resetButton.textContent = "Try Again";
+  updateLeaderboard();
+}
+
+function showGameEndMessage(isWin) {
   showMessage(
     isWin ? "Congratulations, you're a robot!" : "Game Over!",
     isWin ? "win" : "game-over"
   );
-  resetButton.textContent = "Try Again";
-  updateLeaderboard();
-  // if (isWin) {
-  //   displayGif();
-  // }
+}
+
+function endGame(isWin) {
+  gameState.isGameOver = true;
+  if (!isWin) {
+    colorButtons.forEach((button) => {
+      button.classList.add("grayed-out");
+    });
+  }
+  disableButtons();
+  updateUIAfterGameEnd(isWin);
+  showGameEndMessage(isWin);
 }
 
 function blackAndWhite() {
@@ -274,14 +278,16 @@ function createElement(tag, className, styles = {}) {
 }
 
 function getRandomColor() {
-  return COLORS[Math.floor(Math.random() * COLORS.length)];
+  return GAME_CONFIG.colors[
+    Math.floor(Math.random() * GAME_CONFIG.colors.length)
+  ];
 }
 
 function getTimeoutForCurrentLevel() {
-  if (gameState.currentLevel >= 9) return TIMEOUTS.VERY_FAST;
-  if (gameState.currentLevel >= 8) return TIMEOUTS.FAST;
-  if (gameState.currentLevel >= 5) return TIMEOUTS.MEDIUM;
-  return TIMEOUTS.DEFAULT;
+  if (gameState.currentLevel >= 9) return GAME_CONFIG.timeouts.veryFast;
+  if (gameState.currentLevel >= 8) return GAME_CONFIG.timeouts.fast;
+  if (gameState.currentLevel >= 5) return GAME_CONFIG.timeouts.medium;
+  return GAME_CONFIG.timeouts.default;
 }
 
 function updateLevelElement() {
@@ -298,12 +304,15 @@ function clearMessage() {
   messageElement.className = "message";
 }
 
+function playSound(color) {
+  const sound = new Audio(GAME_CONFIG.soundMap[color]);
+  sound.play();
+}
+
 function flashButton(color) {
   const button = document.querySelector(`.color-button[data-color="${color}"]`);
   button.classList.add("active");
-  const soundFilePath = soundMap[color];
-  const sound = new Audio(soundFilePath);
-  sound.play();
+  playSound(color);
   setTimeout(
     () => button.classList.remove("active"),
     getTimeoutForCurrentLevel()
