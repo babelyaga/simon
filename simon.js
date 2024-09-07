@@ -3,9 +3,9 @@ const GAME_CONFIG = {
   colors: ["red", "green", "blue", "yellow"],
   maxLevel: 50,
   timeouts: {
-    default: 550,
-    medium: 350,
-    fast: 250,
+    default: 350,
+    medium: 250,
+    fast: 200,
     veryFast: 150,
   },
   soundMap: {
@@ -16,40 +16,44 @@ const GAME_CONFIG = {
   },
 };
 
-// DOM Elements
-const colorButtons = document.querySelectorAll(".color-button");
-const messageElement = createElement("div", "message");
-const levelElement = createElement("div", "level");
-const resetButton = createElement("button", "reset-button");
-const blackAndWhiteButton = createElement("button", "black-and-white-button");
-const startButton = createElement("button", "start-button");
-const repeatButton = createElement("button", "repeat-button");
-
-// Initial Setup
-const buttons = [
-  {
-    element: blackAndWhiteButton,
-    text: "Black and White",
-    action: blackAndWhite,
-  },
-  { element: startButton, text: "Start Game", action: startGame },
-  { element: repeatButton, text: "Repeat", action: repeatSequence },
-];
-
-buttons.forEach(({ element, text, action }) => {
-  element.textContent = text;
-  element.addEventListener("click", action);
-});
-
 // Game State
 let gameState = {
-  currentLevel: 1,
+  currentLevel: 0,
   sequence: [],
   playerInput: [],
   isGameOver: false,
   repeatUsed: false,
   sequenceIsRunning: false,
 };
+
+// Select the buttons from the HTML
+const colorButtons = document.querySelectorAll(".color-button");
+const messageElement = document.querySelector(".message");
+const levelElement = document.querySelector(".level");
+const resetButton = document.querySelector(".reset-button");
+const blackAndWhiteButton = document.querySelector(".black-and-white-button");
+const startButton = document.querySelector(".start-button");
+const repeatButton = document.querySelector(".repeat-button");
+
+// Event Listeners
+function setupEventListeners() {
+  colorButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!gameState.sequenceIsRunning) playRound(button.dataset.color);
+      playSound(button.dataset.color);
+      button.classList.add("active");
+      setTimeout(
+        () => button.classList.remove("active"),
+        getTimeoutForCurrentLevel()
+      );
+    });
+  });
+
+  resetButton.addEventListener("click", resetGame);
+  blackAndWhiteButton.addEventListener("click", blackAndWhite);
+  startButton.addEventListener("click", startGame);
+  repeatButton.addEventListener("click", repeatSequence);
+}
 
 // Main Functions
 function initializeGame() {
@@ -61,17 +65,8 @@ function initializeGame() {
 }
 
 function startGame() {
-  let nickname = sessionStorage.getItem("nickname");
-
-  if (!nickname) {
-    nickname = prompt("Enter your nickname (max 10 characters):");
-    if (nickname) {
-      nickname = nickname.trim().substring(0, 10);
-      sessionStorage.setItem("nickname", nickname);
-    } else {
-      return;
-    }
-  }
+  let nickname = sessionStorage.getItem("nickname") || promptForNickname();
+  if (!nickname) return;
 
   if (gameState.sequence.length === 0) {
     generateSequence();
@@ -83,7 +78,13 @@ function startGame() {
 }
 
 function playRound(color) {
-  if (gameState.isGameOver) return;
+  if (
+    gameState.isGameOver ||
+    gameState.sequenceIsRunning ||
+    gameState.playerInput.length >= gameState.sequence.length
+  ) {
+    return;
+  }
 
   if (isCorrectColor(color)) {
     handleCorrectInput();
@@ -93,35 +94,17 @@ function playRound(color) {
 }
 
 function resetGame() {
-  resetButton.disabled = gameState.sequence.length === 0;
-  if (gameState.sequence.length > 0) {
-    resetGameState();
-    updateUI();
-    clearMessage();
-    generateSequence();
-    resetButton.textContent = "Reset Game";
-    blackAndWhiteButton.disabled = false;
-    repeatButton.disabled = false;
-    gameState.repeatUsed = false;
-    startButton.remove();
-  }
-}
+  if (gameState.sequence.length === 0) return;
 
-// Helper Functions
-function resetGameState() {
-  gameState = {
-    currentLevel: 1,
-    sequence: [],
-    playerInput: [],
-    isGameOver: false,
-    repeatUsed: false,
-    sequenceIsRunning: false,
-  };
-  colorButtons.forEach((button) => {
-    button.disabled = false;
-    button.classList.remove("grayed-out");
-    button.style.backgroundColor = button.dataset.color;
-  });
+  resetGameState();
+  updateUI();
+  clearMessage();
+  generateSequence();
+  resetButton.textContent = "Reset Game";
+  blackAndWhiteButton.disabled = false;
+  repeatButton.disabled = false;
+  gameState.repeatUsed = false;
+  startButton.remove();
 }
 
 function repeatSequence() {
@@ -134,17 +117,45 @@ function repeatSequence() {
     return;
   }
 
-  colorButtons.forEach((button) => (button.disabled = true));
-  resetButton.disabled = true;
-
+  disableButtons();
   displaySequence();
+  setTimeout(
+    enableButtons,
+    gameState.sequence.length * getTimeoutForCurrentLevel() * 2
+  );
+  gameState.repeatUsed = true;
+  repeatButton.disabled = true;
+}
 
-  setTimeout(() => {
-    colorButtons.forEach((button) => (button.disabled = false));
-    resetButton.disabled = false;
-    gameState.repeatUsed = true;
-    repeatButton.disabled = true;
-  }, gameState.sequence.length * getTimeoutForCurrentLevel() * 2);
+function blackAndWhite() {
+  if (gameState.sequenceIsRunning) return;
+
+  resetGameState();
+  updateUI();
+  clearMessage();
+  generateSequence();
+  colorButtons.forEach((button) => (button.style.backgroundColor = "gray"));
+  blackAndWhiteButton.disabled = true;
+  startButton.remove();
+  gameState.repeatUsed = false;
+  repeatButton.disabled = false;
+}
+
+// Helper Functions
+function resetGameState() {
+  gameState = {
+    currentLevel: 0,
+    sequence: [],
+    playerInput: [],
+    isGameOver: false,
+    repeatUsed: false,
+    sequenceIsRunning: false,
+  };
+  colorButtons.forEach((button) => {
+    button.disabled = false;
+    button.classList.remove("grayed-out");
+    button.style.backgroundColor = button.dataset.color;
+  });
 }
 
 function updateUI() {
@@ -164,27 +175,27 @@ function displaySequence() {
   gameState.sequenceIsRunning = true;
   const timeout = getTimeoutForCurrentLevel();
 
-  colorButtons.forEach((button) => (button.disabled = true));
-  resetButton.disabled = true;
-  repeatButton.disabled = true;
+  // Add the class to disable hover effects
+  document.body.classList.add("no-hover");
 
-  showMessage("Follow the sequence", "message");
+  disableButtons(); // Disable buttons while the sequence is running
+  showMessage("Running...", "message");
 
   gameState.sequence.forEach((color, index) => {
     setTimeout(() => flashButton(color), index * timeout * 2);
   });
 
-  const sequenceEndTime = gameState.sequence.length * timeout * 2 + 300;
+  const sequenceEndTime = gameState.sequence.length * timeout * 2;
+
   setTimeout(() => {
     gameState.sequenceIsRunning = false;
     gameState.playerInput = [];
     clearMessage();
-
-    colorButtons.forEach((button) => (button.disabled = false));
-    resetButton.disabled = false;
-    repeatButton.disabled = gameState.repeatUsed;
-
+    enableButtons(); // Re-enable buttons after the sequence
     showMessage("Your turn!", "message");
+
+    // Remove the class to re-enable hover effects
+    document.body.classList.remove("no-hover");
   }, sequenceEndTime);
 }
 
@@ -194,6 +205,7 @@ function isCorrectColor(color) {
 
 function handleCorrectInput() {
   gameState.playerInput.push(gameState.sequence[gameState.playerInput.length]);
+
   if (gameState.playerInput.length === gameState.sequence.length) {
     if (gameState.currentLevel < GAME_CONFIG.maxLevel) {
       advanceToNextLevel();
@@ -221,58 +233,21 @@ function advanceToNextLevel() {
   }, 1000);
 }
 
-function disableButtons() {
-  colorButtons.forEach((button) => {
-    button.disabled = true;
-  });
-  startButton.remove();
-  repeatButton.disabled = true;
-  blackAndWhiteButton.disabled = true;
-}
-
-function updateUIAfterGameEnd(isWin) {
-  resetButton.textContent = "Try Again";
-  updateLeaderboard();
-}
-
-function showGameEndMessage(isWin) {
-  showMessage(
-    isWin ? "Congratulations, you're a robot!" : "Game Over!",
-    isWin ? "win" : "game-over"
-  );
-}
-
 function endGame(isWin) {
   gameState.isGameOver = true;
   if (!isWin) {
-    colorButtons.forEach((button) => {
-      button.classList.add("grayed-out");
-    });
+    colorButtons.forEach((button) => button.classList.add("grayed-out"));
   }
   disableButtons();
   updateUIAfterGameEnd(isWin);
   showGameEndMessage(isWin);
 }
 
-function blackAndWhite() {
-  resetGameState();
-  updateUI();
-  clearMessage();
-  generateSequence();
-  colorButtons.forEach((button) => {
-    button.style.backgroundColor = "gray";
-  });
-  blackAndWhiteButton.disabled = true;
-  startButton.remove();
-  gameState.repeatUsed = false;
-  repeatButton.disabled = false;
-}
-
 // Utility Functions
-function createElement(tag, className, styles = {}) {
+function createElement(tag, className, text = "") {
   const element = document.createElement(tag);
   element.classList.add(className);
-  Object.assign(element.style, styles);
+  element.textContent = text;
   document.body.appendChild(element);
   return element;
 }
@@ -291,12 +266,12 @@ function getTimeoutForCurrentLevel() {
 }
 
 function updateLevelElement() {
-  levelElement.textContent = `Stage: ${gameState.currentLevel}`;
+  levelElement.textContent = ` ${gameState.currentLevel}`;
 }
 
 function showMessage(text, className) {
   messageElement.textContent = text;
-  messageElement.classList.add(className);
+  messageElement.className = `message ${className}`;
 }
 
 function clearMessage() {
@@ -319,73 +294,95 @@ function flashButton(color) {
   );
 }
 
+function disableButtons() {
+  colorButtons.forEach((button) => (button.disabled = true));
+  resetButton.disabled = true;
+  blackAndWhiteButton.disabled = true;
+  repeatButton.disabled = true;
+}
+
+function enableButtons() {
+  colorButtons.forEach((button) => (button.disabled = false));
+  resetButton.disabled = false;
+  blackAndWhiteButton.disabled = false;
+  repeatButton.disabled = gameState.repeatUsed;
+}
+
+function promptForNickname() {
+  const nickname = prompt("Enter your nickname (max 10 characters):");
+  if (nickname) {
+    const trimmedNickname = nickname.trim().substring(0, 10);
+    sessionStorage.setItem("nickname", trimmedNickname);
+    return trimmedNickname;
+  }
+  return null;
+}
+
+function updateUIAfterGameEnd(isWin) {
+  resetButton.textContent = "Try Again";
+  resetButton.disabled = false;
+  updateLeaderboard();
+}
+
+function showGameEndMessage(isWin) {
+  showMessage(
+    isWin ? "Congratulations, you're a robot!" : "Game Over!",
+    isWin ? "win" : "game-over"
+  );
+}
+
 function updateLeaderboard() {
   const leaderboardDiv = document.getElementById("leaderboard");
   if (!leaderboardDiv) return;
 
-  const currentLevel = gameState.currentLevel;
   let storedScores = JSON.parse(localStorage.getItem("scores")) || [];
   let storedNicknames = JSON.parse(localStorage.getItem("nicknames")) || {};
 
-  storedScores = storedScores.filter(
-    (score) =>
-      typeof score.level === "number" &&
-      !isNaN(score.level) &&
-      score.date &&
-      !isNaN(new Date(score.date).getTime())
-  );
+  storedScores = filterValidScores(storedScores);
 
   if (gameState.isGameOver) {
-    const nickname = sessionStorage.getItem("nickname");
-    storedNicknames[currentLevel] = nickname;
-    localStorage.setItem("nicknames", JSON.stringify(storedNicknames));
-
-    const newScore = {
-      level: currentLevel,
-      date: new Date().toISOString(),
-      nickname: storedNicknames[currentLevel],
-    };
-    storedScores.push(newScore);
+    addNewScore(storedScores, storedNicknames);
   }
 
-  storedScores.sort((a, b) => {
-    if (b.level !== a.level) {
-      return b.level - a.level;
-    }
-    return new Date(b.date) - new Date(a.date);
-  });
-
+  // Sort scores by level only
+  storedScores.sort((a, b) => b.level - a.level);
   storedScores = storedScores.slice(0, 5);
 
   localStorage.setItem("scores", JSON.stringify(storedScores));
+  localStorage.setItem("nicknames", JSON.stringify(storedNicknames));
 
+  displayLeaderboard(leaderboardDiv, storedScores);
+}
+
+function filterValidScores(scores) {
+  return scores.filter(
+    (score) =>
+      typeof score.level === "number" && !isNaN(score.level) && score.nickname // Remove date validation
+  );
+}
+
+function addNewScore(scores, nicknames) {
+  const nickname = sessionStorage.getItem("nickname");
+  nicknames[gameState.currentLevel] = nickname;
+  scores.push({
+    level: gameState.currentLevel,
+    nickname: nickname,
+  });
+}
+
+function displayLeaderboard(leaderboardDiv, scores) {
   leaderboardDiv.innerHTML = "";
-
   const leaderboardList = document.createElement("ul");
 
-  storedScores.forEach((score, index) => {
+  scores.forEach((score, index) => {
     const listItem = document.createElement("li");
-    const scoreDate = new Date(score.date);
-    const formattedDate = scoreDate.toLocaleDateString();
-    listItem.textContent = `${index + 1}: Stage ${score.level} (${
+    listItem.textContent = `${index + 1}: Score ${score.level} (${
       score.nickname
-    }) - ${formattedDate}`;
+    })`;
     leaderboardList.appendChild(listItem);
   });
 
   leaderboardDiv.appendChild(leaderboardList);
-}
-
-function setupEventListeners() {
-  colorButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      if (gameState.sequenceIsRunning) return;
-      playRound(button.dataset.color);
-    });
-  });
-
-  resetButton.textContent = "Reset Game";
-  resetButton.addEventListener("click", resetGame);
 }
 
 // Initialize Game
