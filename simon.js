@@ -9,10 +9,10 @@ const GAME_CONFIG = {
     veryFast: 150,
   },
   soundMap: {
-    red: "red.mp3",
-    green: "green.mp3",
-    blue: "blue.mp3",
-    yellow: "yellow.mp3",
+    red: "/Audio/red.mp3",
+    green: "/Audio/green.mp3",
+    blue: "/Audio/blue.mp3",
+    yellow: "/Audio/yellow.mp3",
   },
 };
 
