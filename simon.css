@@ -5,7 +5,9 @@ body {
 }
 
 * {
-  font-family: "Bubblegum Sans", cursive;
+  font-family: "Pixelify Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
   color: #ffffff;
 }
 
@@ -48,7 +50,7 @@ body {
 }
 
 .color-button {
-  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     filter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   will-change: transform, filter;
   border: none;
@@ -121,16 +123,14 @@ body {
   transition: all 0.3s ease;
 }
 
-.correct,
-.incorrect,
 .message {
-  font-size: 30px;
-  position: absolute;
-  top: 10px;
+  position: fixed;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1;
+  font-size: 30px;
 }
 
 .control-container {
@@ -141,7 +141,7 @@ body {
   position: absolute;
   bottom: 10px;
   left: 10px;
-  gap: 10px;
+  gap: 20px;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -157,8 +157,6 @@ body {
   color: #000000;
   border: none;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease-in-out;
 }
 
@@ -166,9 +164,9 @@ body {
 .black-and-white-button:hover,
 .start-button:hover,
 .repeat-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.7),
-    0 0 30px rgba(255, 255, 255, 0.5);
+  background-color: #1b1a1a;
+  color: #ffffff;
+  box-shadow: 0 0 15px #56df66b3, 0 0 30px #56df66b3;
 }
 
 .reset-button:disabled,
@@ -177,34 +175,67 @@ body {
 .repeat-button:disabled {
   opacity: 0.1;
   cursor: not-allowed;
-  transition: opacity 0.3s ease-in-out;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3),
-    0 0 10px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
-#leaderboard {
+.reset-button:disabled:hover,
+.black-and-white-button:disabled:hover,
+.start-button:disabled:hover,
+.repeat-button:disabled:hover {
+  opacity: 0.1;
+  box-shadow: none;
+  transition: all 0.3s ease-in-out;
+}
+
+#high-score {
   position: fixed;
   top: 0;
   left: 0;
-  font-size: 30px;
-  text-align: left;
-  padding: 10px;
+  padding: 15px;
+  z-index: 1;
+  font-size: 18px;
 }
 
-#leaderboard ul {
-  list-style-type: none;
-  padding: 0;
+.game-over-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* semi-transparent black */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2em;
+  text-align: center;
+  z-index: 1000;
+  visibility: hidden; /* initially hidden */
 }
 
-#leaderboard ul li {
-  font-size: 20px;
-  margin: 10px 0;
-  padding: 5px;
-  background-color: transparent;
-  transition: all 0.3s ease;
+.game-over-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-#leaderboard ul li:hover {
-  color: #1dc54d;
-  transform: scale(1.1);
+.game-over-text {
+  font-size: 2.5em;
+  margin-bottom: 10px; /* Space between message and score */
+}
+
+.game-over-score {
+  font-size: 1em;
+}
+
+/* Class to hide all controls except the reset button */
+.overlay-active .control-container button:not(.reset-button),
+.overlay-active #high-score {
+  display: none;
+}
+
+.reset-button {
+  position: relative;
+  z-index: 1001; /* Ensure button is above the overlay */
 }

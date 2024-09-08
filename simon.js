@@ -60,14 +60,12 @@ function initializeGame() {
   resetGameState();
   updateUI();
   setupEventListeners();
-  updateLeaderboard();
+  updateHighScore();
   colorButtons.forEach((button) => (button.disabled = true));
 }
 
 function startGame() {
-  let nickname = sessionStorage.getItem("nickname") || promptForNickname();
-  if (!nickname) return;
-
+  hideGameEndMessage(); // Hide the overlay when starting the game
   if (gameState.sequence.length === 0) {
     generateSequence();
     startButton.disabled = true;
@@ -94,6 +92,7 @@ function playRound(color) {
 }
 
 function resetGame() {
+  hideGameEndMessage(); // Hide the overlay when resetting the game
   if (gameState.sequence.length === 0) return;
 
   resetGameState();
@@ -175,10 +174,9 @@ function displaySequence() {
   gameState.sequenceIsRunning = true;
   const timeout = getTimeoutForCurrentLevel();
 
-  // Add the class to disable hover effects
   document.body.classList.add("no-hover");
 
-  disableButtons(); // Disable buttons while the sequence is running
+  disableButtons();
   showMessage("Running...", "message");
 
   gameState.sequence.forEach((color, index) => {
@@ -188,14 +186,12 @@ function displaySequence() {
   const sequenceEndTime = gameState.sequence.length * timeout * 2;
 
   setTimeout(() => {
+    clearMessage();
     gameState.sequenceIsRunning = false;
     gameState.playerInput = [];
-    clearMessage();
-    enableButtons(); // Re-enable buttons after the sequence
-    showMessage("Your turn!", "message");
-
-    // Remove the class to re-enable hover effects
+    enableButtons();
     document.body.classList.remove("no-hover");
+    showMessage("Your turn!", "message");
   }, sequenceEndTime);
 }
 
@@ -225,11 +221,13 @@ function handleIncorrectInput() {
 
 function advanceToNextLevel() {
   showMessage("Correct!", "correct");
+  disableButtons();
   setTimeout(() => {
     clearMessage("correct");
     gameState.currentLevel++;
     updateUI();
     generateSequence();
+    enableButtons();
   }, 1000);
 }
 
@@ -302,87 +300,73 @@ function disableButtons() {
 }
 
 function enableButtons() {
-  colorButtons.forEach((button) => (button.disabled = false));
-  resetButton.disabled = false;
-  blackAndWhiteButton.disabled = false;
-  repeatButton.disabled = gameState.repeatUsed;
+  if (!gameState.sequenceIsRunning) {
+    colorButtons.forEach((button) => (button.disabled = false));
+    resetButton.disabled = false;
+    blackAndWhiteButton.disabled = false;
+    repeatButton.disabled = gameState.repeatUsed;
+  }
 }
 
-function promptForNickname() {
-  const nickname = prompt("Enter your nickname (max 10 characters):");
-  if (nickname) {
-    const trimmedNickname = nickname.trim().substring(0, 10);
-    sessionStorage.setItem("nickname", trimmedNickname);
-    return trimmedNickname;
+function updateHighScore() {
+  const highScore = localStorage.getItem("highScore");
+  const currentScore = gameState.currentLevel;
+  if (!highScore || currentScore > parseInt(highScore, 10)) {
+    localStorage.setItem("highScore", currentScore);
   }
-  return null;
+
+  const highScoreElement = document.getElementById("high-score");
+  if (highScoreElement) {
+    highScoreElement.textContent = `High Score: ${
+      localStorage.getItem("highScore") || 0
+    }`;
+  }
 }
 
 function updateUIAfterGameEnd(isWin) {
   resetButton.textContent = "Try Again";
   resetButton.disabled = false;
-  updateLeaderboard();
+  updateHighScore();
 }
 
 function showGameEndMessage(isWin) {
-  showMessage(
-    isWin ? "Congratulations, you're a robot!" : "Game Over!",
-    isWin ? "win" : "game-over"
-  );
-}
-
-function updateLeaderboard() {
-  const leaderboardDiv = document.getElementById("leaderboard");
-  if (!leaderboardDiv) return;
-
-  let storedScores = JSON.parse(localStorage.getItem("scores")) || [];
-  let storedNicknames = JSON.parse(localStorage.getItem("nicknames")) || {};
-
-  storedScores = filterValidScores(storedScores);
-
-  if (gameState.isGameOver) {
-    addNewScore(storedScores, storedNicknames);
+  // Create or select the overlay element
+  let overlay = document.querySelector(".game-over-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.classList.add("game-over-overlay");
+    document.body.appendChild(overlay);
   }
 
-  // Sort scores by level only
-  storedScores.sort((a, b) => b.level - a.level);
-  storedScores = storedScores.slice(0, 5);
+  // Create or select the message container
+  let messageContainer = document.querySelector(".game-over-message-container");
+  if (!messageContainer) {
+    messageContainer = document.createElement("div");
+    messageContainer.classList.add("game-over-message-container");
+    overlay.appendChild(messageContainer);
+  }
 
-  localStorage.setItem("scores", JSON.stringify(storedScores));
-  localStorage.setItem("nicknames", JSON.stringify(storedNicknames));
+  // Set the message and score
+  messageContainer.innerHTML = `
+    <div class="game-over-text">${
+      isWin ? "Congratulations, you're a robot!" : "Game Over!"
+    }</div>
+    <div class="game-over-score">Your Score: ${gameState.currentLevel}</div>
+  `;
 
-  displayLeaderboard(leaderboardDiv, storedScores);
+  // Show the overlay and hide other controls
+  overlay.style.visibility = "visible";
+  document.body.classList.add("overlay-active");
 }
 
-function filterValidScores(scores) {
-  return scores.filter(
-    (score) =>
-      typeof score.level === "number" && !isNaN(score.level) && score.nickname // Remove date validation
-  );
-}
+function hideGameEndMessage() {
+  const overlay = document.querySelector(".game-over-overlay");
+  if (overlay) {
+    overlay.style.visibility = "hidden";
+  }
 
-function addNewScore(scores, nicknames) {
-  const nickname = sessionStorage.getItem("nickname");
-  nicknames[gameState.currentLevel] = nickname;
-  scores.push({
-    level: gameState.currentLevel,
-    nickname: nickname,
-  });
-}
-
-function displayLeaderboard(leaderboardDiv, scores) {
-  leaderboardDiv.innerHTML = "";
-  const leaderboardList = document.createElement("ul");
-
-  scores.forEach((score, index) => {
-    const listItem = document.createElement("li");
-    listItem.textContent = `${index + 1}: Score ${score.level} (${
-      score.nickname
-    })`;
-    leaderboardList.appendChild(listItem);
-  });
-
-  leaderboardDiv.appendChild(leaderboardList);
+  // Show all controls when overlay is hidden
+  document.body.classList.remove("overlay-active");
 }
 
 // Initialize Game
