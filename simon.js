@@ -33,7 +33,7 @@ const repeatButton = document.querySelector(".repeat-button");
 // Event Listeners
 // ====================
 function setupEventListeners() {
-  setupPlayerInputListeners(); // Added here as per your request
+  setupPlayerInputListeners();
 
   resetButton.addEventListener("click", resetGame);
   blackAndWhiteButton.addEventListener("click", blackAndWhite);
