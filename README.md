@@ -18,7 +18,7 @@ Here's what I've packed into this little game:
 - High score tracking using local storage
 - A "Repeat" button to replay the current sequence (but use it wisely, only once per game!)
 - "Reset" button when you want to start fresh
-- "Dark Mode" toggle for a different visual experience (I thought it looked cool)
+- "Dark Mode" toggle for a different visual experience (I thought it looked cool + it makes it a tad more difficult)
 - Responsive design - try it on your phone!
 - Sound effects for button presses (mute your device if you're playing at work!)
 - Game over overlay to show off your final score
