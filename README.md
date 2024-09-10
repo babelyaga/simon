@@ -1,5 +1,6 @@
 # Simon Says Game 🔴🟢🔵🟡
 Design inspired by [React Simon Says](https://github.com/weslleyaraujo/react-simon-says)
+
 ![Simon Game Screenshot](Assets/simon-desktop.png)
 
 Hey there! Welcome to my Simon Says game. I built this as a JavaScript, HTML, and CSS implementation of the classic memory game. It's a practice project I created to explore vanilla web technologies and improve my coding skills.
