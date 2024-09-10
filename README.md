@@ -51,7 +51,9 @@ Here's what I've packed into this little game:
 Want to run this locally? It's easy:
 1. Clone this repo or download the source files.
 2. Open `index.html` in your favorite modern web browser.
-3. That's it! No npm install, no build process. Old school, right?
+3. That's it! No npm install, no build process. Old school 🤓?
+
+Or simply go to babelyaga.github.io/simon and start playing.
 
 ## What I Learned
 
