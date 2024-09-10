@@ -230,7 +230,7 @@ function displaySequence() {
 function startEasterEggTimer() {
   const inputTimeout = setTimeout(() => {
     startEasterEggConversation();
-  }, 60); // Wait for 60 seconds of inactivity before starting Easter egg
+  }, 60000); // Wait for 60 seconds of inactivity before starting Easter egg
   globalTimeouts.push(inputTimeout);
 
   // Cancel the Easter egg if the user interacts
