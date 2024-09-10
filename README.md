@@ -8,6 +8,23 @@ Hey there! Welcome to my Simon Says game. I built this as a JavaScript, HTML, an
 
 I want to be upfront: I'm fully aware that using React and Redux would be a much better choice for building this game in a production environment. However, I intentionally chose to use vanilla JavaScript, HTML, and CSS as a learning exercise. My goal was to understand these core technologies without the abstraction of modern frameworks. It's been a great journey in understanding the fundamentals!
 
+## Setup
+
+Want to run this locally? It's easy:
+1. Clone this repo or download the source files.
+2. Open `index.html` in your favorite modern web browser.
+3. That's it! No npm install, no build process. Old school 🤓?
+
+Or simply go to [babelyaga.github.io/simon](https://babelyaga.github.io/simon) and start playing.
+
+## How to Play
+
+1. Hit that "Start" button to kick things off.
+2. Watch and listen to the sequence I'll show you.
+3. Repeat it back by clicking the colored buttons in the same order.
+4. Get it right, and I'll add another step to the sequence. How far can you go?
+5. Make a mistake, and it's game over! But don't worry, you can always try again.
+
 ## Game Features
 
 Here's what I've packed into this little game:
@@ -22,14 +39,6 @@ Here's what I've packed into this little game:
 - Responsive design - try it on your phone!
 - Sound effects for button presses (mute your device if you're playing at work!)
 - Game over overlay to show off your final score
-
-## How to Play
-
-1. Hit that "Start" button to kick things off.
-2. Watch and listen to the sequence I'll show you.
-3. Repeat it back by clicking the colored buttons in the same order.
-4. Get it right, and I'll add another step to the sequence. How far can you go?
-5. Make a mistake, and it's game over! But don't worry, you can always try again.
 
 ## Game Controls
 
@@ -49,15 +58,6 @@ Here's what I've packed into this little game:
 - Added some CSS animations for button feedback
 - Implemented the Web Audio API for those cool sound effects
 - Your high score is saved in your browser's local storage
-
-## Setup
-
-Want to run this locally? It's easy:
-1. Clone this repo or download the source files.
-2. Open `index.html` in your favorite modern web browser.
-3. That's it! No npm install, no build process. Old school 🤓?
-
-Or simply go to [babelyaga.github.io/simon](https://babelyaga.github.io/simon) and start playing.
 
 ## What I Learned
 
