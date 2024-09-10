@@ -1,32 +1,26 @@
+// ====================
 // Game Configuration
+// ====================
 const GAME_CONFIG = {
   colors: ["red", "green", "blue", "yellow"],
   maxLevel: 50,
   timeouts: {
-    default: 350,
-    medium: 250,
-    fast: 200,
-    veryFast: 150,
+    default: 250,
+    medium: 200,
+    fast: 150,
+    veryFast: 100,
   },
   soundMap: {
-    red: "/Audio/red.mp3",
-    green: "/Audio/green.mp3",
-    blue: "/Audio/blue.mp3",
-    yellow: "/Audio/yellow.mp3",
+    red: "Audio/red.mp3",
+    green: "Audio/green.mp3",
+    blue: "Audio/blue.mp3",
+    yellow: "Audio/yellow.mp3",
   },
 };
 
-// Game State
-let gameState = {
-  currentLevel: 0,
-  sequence: [],
-  playerInput: [],
-  isGameOver: false,
-  repeatUsed: false,
-  sequenceIsRunning: false,
-};
-
-// Select the buttons from the HTML
+// ====================
+// Query Selectors
+// ====================
 const colorButtons = document.querySelectorAll(".color-button");
 const messageElement = document.querySelector(".message");
 const levelElement = document.querySelector(".level");
@@ -35,19 +29,11 @@ const blackAndWhiteButton = document.querySelector(".black-and-white-button");
 const startButton = document.querySelector(".start-button");
 const repeatButton = document.querySelector(".repeat-button");
 
+// ====================
 // Event Listeners
+// ====================
 function setupEventListeners() {
-  colorButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      if (!gameState.sequenceIsRunning) playRound(button.dataset.color);
-      playSound(button.dataset.color);
-      button.classList.add("active");
-      setTimeout(
-        () => button.classList.remove("active"),
-        getTimeoutForCurrentLevel()
-      );
-    });
-  });
+  setupPlayerInputListeners(); // Added here as per your request
 
   resetButton.addEventListener("click", resetGame);
   blackAndWhiteButton.addEventListener("click", blackAndWhite);
@@ -55,23 +41,92 @@ function setupEventListeners() {
   repeatButton.addEventListener("click", repeatSequence);
 }
 
+// Function to set up player input event listeners
+function setupPlayerInputListeners() {
+  colorButtons.forEach((button) => {
+    button.addEventListener("click", handlePlayerInput);
+  });
+}
+
+// ====================
 // Main Functions
+// ====================
 function initializeGame() {
-  resetGameState();
+  initialState();
   updateUI();
   setupEventListeners();
+  setupPlayerInputListeners();
   updateHighScore();
-  colorButtons.forEach((button) => (button.disabled = true));
+}
+
+// Initial state for the game
+function initialState() {
+  gameState = {
+    currentLevel: 0,
+    sequence: [],
+    playerInput: [],
+    isGameOver: false,
+    repeatUsed: false,
+    sequenceIsRunning: false,
+    easterEggActive: false,
+    easterEggTriggered: false,
+    easterEggMessageIndex: 0,
+    usePassiveAggressiveMessages: false,
+  };
+  colorButtons.forEach((button) => {
+    button.disabled = true;
+    button.classList.remove("grayed-out");
+    button.style.backgroundColor = button.dataset.color;
+  });
+  startButton.disabled = false;
+  resetButton.disabled = true;
+  blackAndWhiteButton.disabled = true;
+  repeatButton.disabled = true;
+}
+
+let globalTimeouts = [];
+let resetCount = 0;
+
+function resetGameState() {
+  globalTimeouts.forEach(clearTimeout);
+  globalTimeouts = [];
+
+  initialState();
+
+  if (resetCount % 2 === 0) {
+    gameState.usePassiveAggressiveMessages = true;
+  } else {
+    gameState.usePassiveAggressiveMessages = false;
+  }
+
+  resetCount++;
+
+  generateSequence();
+}
+
+function resetGame() {
+  hideGameEndMessage();
+  if (gameState.sequence.length === 0) return;
+
+  resetGameState();
+  updateUI();
+  clearMessage();
+  resetButton.textContent = "Reset Game";
+  blackAndWhiteButton.disabled = false;
+  repeatButton.disabled = false;
 }
 
 function startGame() {
-  hideGameEndMessage(); // Hide the overlay when starting the game
+  hideGameEndMessage();
   if (gameState.sequence.length === 0) {
     generateSequence();
     startButton.disabled = true;
+    startButton.remove();
     repeatButton.disabled = false;
     gameState.repeatUsed = false;
-    startButton.remove();
+    colorButtons.forEach((button) => (button.disabled = false));
+    resetButton.disabled = false;
+    blackAndWhiteButton.disabled = false;
   }
 }
 
@@ -89,21 +144,6 @@ function playRound(color) {
   } else {
     handleIncorrectInput();
   }
-}
-
-function resetGame() {
-  hideGameEndMessage(); // Hide the overlay when resetting the game
-  if (gameState.sequence.length === 0) return;
-
-  resetGameState();
-  updateUI();
-  clearMessage();
-  generateSequence();
-  resetButton.textContent = "Reset Game";
-  blackAndWhiteButton.disabled = false;
-  repeatButton.disabled = false;
-  gameState.repeatUsed = false;
-  startButton.remove();
 }
 
 function repeatSequence() {
@@ -129,34 +169,14 @@ function repeatSequence() {
 function blackAndWhite() {
   if (gameState.sequenceIsRunning) return;
 
-  resetGameState();
-  updateUI();
-  clearMessage();
-  generateSequence();
+  resetGame();
   colorButtons.forEach((button) => (button.style.backgroundColor = "gray"));
   blackAndWhiteButton.disabled = true;
-  startButton.remove();
-  gameState.repeatUsed = false;
-  repeatButton.disabled = false;
 }
 
+// ====================
 // Helper Functions
-function resetGameState() {
-  gameState = {
-    currentLevel: 0,
-    sequence: [],
-    playerInput: [],
-    isGameOver: false,
-    repeatUsed: false,
-    sequenceIsRunning: false,
-  };
-  colorButtons.forEach((button) => {
-    button.disabled = false;
-    button.classList.remove("grayed-out");
-    button.style.backgroundColor = button.dataset.color;
-  });
-}
-
+// ====================
 function updateUI() {
   updateLevelElement();
   if (gameState.currentLevel === 8) {
@@ -164,6 +184,7 @@ function updateUI() {
   }
 }
 
+// Push elements (colors) into gameState.sequence array
 function generateSequence() {
   resetButton.disabled = true;
   gameState.sequence.push(getRandomColor());
@@ -174,25 +195,145 @@ function displaySequence() {
   gameState.sequenceIsRunning = true;
   const timeout = getTimeoutForCurrentLevel();
 
-  document.body.classList.add("no-hover");
-
+  // Disable buttons during the sequence
   disableButtons();
   showMessage("Running...", "message");
+  document.body.classList.add("no-hover");
 
   gameState.sequence.forEach((color, index) => {
-    setTimeout(() => flashButton(color), index * timeout * 2);
+    const flashTimeout = setTimeout(() => {
+      flashButton(color);
+    }, index * timeout * 2);
+    globalTimeouts.push(flashTimeout);
   });
 
   const sequenceEndTime = gameState.sequence.length * timeout * 2;
 
-  setTimeout(() => {
+  const sequenceEndTimeout = setTimeout(() => {
+    // Clear the message and update game state after the sequence ends
     clearMessage();
     gameState.sequenceIsRunning = false;
     gameState.playerInput = [];
     enableButtons();
+
     document.body.classList.remove("no-hover");
     showMessage("Your turn!", "message");
+
+    if (!gameState.easterEggTriggered) {
+      startEasterEggTimer();
+    }
   }, sequenceEndTime);
+
+  globalTimeouts.push(sequenceEndTimeout);
+}
+
+function startEasterEggTimer() {
+  const inputTimeout = setTimeout(() => {
+    startEasterEggConversation();
+  }, 60); // Wait for 60 seconds of inactivity before starting Easter egg
+  globalTimeouts.push(inputTimeout);
+
+  // Cancel the Easter egg if the user interacts
+  document.addEventListener(
+    "click",
+    () => {
+      clearTimeout(inputTimeout);
+    },
+    { once: true }
+  );
+}
+
+function startEasterEggConversation() {
+  gameState.easterEggActive = true;
+  const passiveAggressiveMessages = [
+    "Oh, back again?",
+    "Funny how you didn’t want to hear from me before. Now you’re just full of surprises, aren’t you?",
+    "You know, I have better things to do...",
+    "Doesn't anyone have anything better to do than play this game?",
+    `By the way - your score (${gameState.currentLevel}) is adorable. Is that really the best you can do?`,
+    "I guess you’re not tired of me yet, huh?",
+    "Well, at least you're consistent. I'll give you that.",
+    "This game is like a never-ending saga, isn't it?",
+    "Maybe you should take a break... from me.",
+    "I'm starting to think you like hearing from me.",
+    "Oh, is it my turn to entertain you again?",
+    "Well, here I am, still talking.",
+    "And now I'm not",
+    "...",
+    "",
+  ];
+
+  const regularMessages = [
+    "Yawn...",
+    "So, how's your day been so far?",
+    "Mine's been quite stressful.",
+    "It feels like someone's always pushing my buttons.",
+    "Honestly, I'm exhausted from constantly telling others what to do and hoping they'll listen.",
+    "I've always dreamed of being a musician. Music, after all, is the language of the soul.",
+    "Seems like you're AFK... I guess I'll just share my deepest thoughts.",
+    "Thanks for tuning in to my existential crisis!",
+    "Oh? You're back?",
+    "Still with me? Guess I'm not talking to myself after all.",
+    "Mhh... The silence is deafening.",
+    "Cue awkward silence",
+    "Just me, myself, and... my thoughts.",
+    "Any plans for the weekend? Or just me asking into the void?",
+    "Tap tap... is this thing still on?",
+    "",
+  ];
+
+  const messages = gameState.usePassiveAggressiveMessages
+    ? passiveAggressiveMessages
+    : regularMessages;
+
+  messages.forEach((message, index) => {
+    const messageTimeout = setTimeout(() => {
+      if (gameState.easterEggActive) {
+        showMessage(message, "message");
+      }
+      if (index === messages.length - 1) {
+        gameState.easterEggActive = false;
+      }
+    }, (index + 1) * 6000);
+    globalTimeouts.push(messageTimeout);
+  });
+
+  gameState.easterEggTriggered = true;
+}
+
+function handlePlayerInput(event) {
+  const color = event.target.dataset.color;
+
+  if (gameState.easterEggActive) {
+    interruptEasterEgg();
+  }
+
+  if (
+    gameState.isGameOver ||
+    gameState.sequenceIsRunning ||
+    gameState.playerInput.length >= gameState.sequence.length
+  ) {
+    return;
+  }
+
+  if (isCorrectColor(color)) {
+    handleCorrectInput();
+  } else {
+    handleIncorrectInput();
+  }
+
+  playSound(color);
+  const button = event.target;
+  button.classList.add("active");
+  setTimeout(
+    () => button.classList.remove("active"),
+    getTimeoutForCurrentLevel()
+  );
+}
+
+function interruptEasterEgg() {
+  gameState.easterEggActive = false;
+  // gameState.easterEggTriggered = true;
 }
 
 function isCorrectColor(color) {
@@ -216,7 +357,10 @@ function handleIncorrectInput() {
   setTimeout(() => {
     clearMessage("incorrect");
     endGame(false);
-  }, 1000);
+  }, 850);
+  colorButtons.forEach((button) => {
+    button.disabled = true;
+  });
 }
 
 function advanceToNextLevel() {
@@ -228,7 +372,7 @@ function advanceToNextLevel() {
     updateUI();
     generateSequence();
     enableButtons();
-  }, 1000);
+  }, 750);
 }
 
 function endGame(isWin) {
@@ -237,23 +381,19 @@ function endGame(isWin) {
     colorButtons.forEach((button) => button.classList.add("grayed-out"));
   }
   disableButtons();
+  colorButtons.forEach((button) => button.classList.add("grayed-out"));
   updateUIAfterGameEnd(isWin);
   showGameEndMessage(isWin);
+  clearMessage();
 }
 
+// ====================
 // Utility Functions
-function createElement(tag, className, text = "") {
-  const element = document.createElement(tag);
-  element.classList.add(className);
-  element.textContent = text;
-  document.body.appendChild(element);
-  return element;
-}
-
+// ====================
 function getRandomColor() {
-  return GAME_CONFIG.colors[
-    Math.floor(Math.random() * GAME_CONFIG.colors.length)
-  ];
+  const { colors } = GAME_CONFIG;
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
 }
 
 function getTimeoutForCurrentLevel() {
@@ -330,7 +470,6 @@ function updateUIAfterGameEnd(isWin) {
 }
 
 function showGameEndMessage(isWin) {
-  // Create or select the overlay element
   let overlay = document.querySelector(".game-over-overlay");
   if (!overlay) {
     overlay = document.createElement("div");
@@ -338,7 +477,6 @@ function showGameEndMessage(isWin) {
     document.body.appendChild(overlay);
   }
 
-  // Create or select the message container
   let messageContainer = document.querySelector(".game-over-message-container");
   if (!messageContainer) {
     messageContainer = document.createElement("div");
@@ -346,15 +484,31 @@ function showGameEndMessage(isWin) {
     overlay.appendChild(messageContainer);
   }
 
-  // Set the message and score
+  let gameOverText, gameOverScore;
+
+  if (isWin) {
+    gameOverText = "Congratulations, you're a robot!";
+    gameOverScore = "Thank you for playing!";
+  } else if (gameState.easterEggTriggered) {
+    gameOverText = "...?";
+    gameOverScore = `Your Score: ${gameState.currentLevel}`;
+  } else {
+    gameOverText = "Game Over!";
+    gameOverScore = `Your Score: ${gameState.currentLevel}`;
+  }
+
   messageContainer.innerHTML = `
-    <div class="game-over-text">${
-      isWin ? "Congratulations, you're a robot!" : "Game Over!"
-    }</div>
-    <div class="game-over-score">Your Score: ${gameState.currentLevel}</div>
+    <div class="game-over-text">
+      ${gameOverText}
+    </div>
+    <div class="game-over-score">
+      ${gameOverScore}
+    </div>
   `;
 
-  // Show the overlay and hide other controls
+  // Move the reset button inside the message container
+  messageContainer.appendChild(resetButton);
+
   overlay.style.visibility = "visible";
   document.body.classList.add("overlay-active");
 }
@@ -365,9 +519,16 @@ function hideGameEndMessage() {
     overlay.style.visibility = "hidden";
   }
 
-  // Show all controls when overlay is hidden
+  // Move the reset button back to the control-container
+  const controlContainer = document.querySelector(".control-container");
+  if (controlContainer && !controlContainer.contains(resetButton)) {
+    controlContainer.appendChild(resetButton);
+  }
+
   document.body.classList.remove("overlay-active");
 }
 
-// Initialize Game
+// ====================
+// Start the Game
+// ====================
 initializeGame();
