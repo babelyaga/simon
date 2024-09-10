@@ -57,7 +57,7 @@ Want to run this locally? It's easy:
 2. Open `index.html` in your favorite modern web browser.
 3. That's it! No npm install, no build process. Old school 🤓?
 
-Or simply go to babelyaga.github.io/simon and start playing.
+Or simply go to [babelyaga.github.io/simon](https://babelyaga.github.io/simon) and start playing.
 
 ## What I Learned
 
