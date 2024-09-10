@@ -79,7 +79,8 @@ I've got some ideas for future updates:
 - Hooking it up to a backend for global high scores
 
 ## Easter Egg
-There is a reason why the app's name is "Simon Said" and not "Simon Says"
+There is a reason why the app's name is "Simon Said" and not "Simon Says".
+
 I've hidden a little surprise in the game that triggers after a period of inactivity. See if you can find it!
 
 Thanks for checking out my project. I had a blast making it and I hope you enjoy playing! Feel free to reach out if you have any questions or suggestions. Now what did Simon say exactly?
