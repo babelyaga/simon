@@ -1,3 +1,4 @@
+https://babelyaga.github.io/simon/
 Simon Says Game 🔴🔵🟡🟢 #SimonSaysGame
 
 This is a JavaScript and HTML/CSS game application made for practicing vanilla Javascript and HTML&CSS. The goal of the game is to repeat the sequence of colors displayed by the game.
