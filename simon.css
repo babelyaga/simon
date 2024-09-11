@@ -315,3 +315,52 @@ body {
 .overlay-active .level .overlay-active .message {
   display: none;
 }
+
+@media (hover: hover) {
+}
+
+@media (hover: none) {
+  .reset-button,
+  .black-and-white-button,
+  .start-button,
+  .repeat-button {
+    border-radius: 100px;
+    background-color: #d7d7d7;
+    color: #000000;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .reset-button:hover,
+  .black-and-white-button:hover,
+  .start-button:hover,
+  .repeat-button:hover {
+    background-color: #d7d7d7;
+    color: #000000;
+    box-shadow: none;
+  }
+
+  .color-button {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      filter 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: none;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    aspect-ratio: 1 / 1;
+    filter: brightness(100%);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .color-button:hover {
+    transform: none;
+    filter: brightness(100%);
+    cursor: pointer;
+  }
+
+  .color-button.active {
+    transform: none;
+    filter: brightness(10%);
+    cursor: pointer;
+  }
+}
