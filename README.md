@@ -1,5 +1,6 @@
 # Simon Says Game 🔴🟢🔵🟡
 Design inspired by [React Simon Says](https://github.com/weslleyaraujo/react-simon-says)
+
 ![Simon Game Screenshot](Assets/simon-desktop.png)
 
 Hey there! Welcome to my Simon Says game. I built this as a JavaScript, HTML, and CSS implementation of the classic memory game. It's a practice project I created to explore vanilla web technologies and improve my coding skills.
@@ -20,9 +21,9 @@ Or simply go to [babelyaga.github.io/simon](https://babelyaga.github.io/simon) a
 ## How to Play
 
 1. Hit that "Start" button to kick things off.
-2. Watch and listen to the sequence I'll show you.
+2. Watch and listen to the sequence.
 3. Repeat it back by clicking the colored buttons in the same order.
-4. Get it right, and I'll add another step to the sequence. How far can you go?
+4. Get it right, and I'll add another step to the sequence.?
 5. Make a mistake, and it's game over! But don't worry, you can always try again.
 
 ## Game Features
@@ -78,10 +79,10 @@ I've got some ideas for future updates:
 - Maybe a multiplayer mode?
 - Hooking it up to a backend for global high scores
 
-## Easter Egg
+## Secret
 There is a reason why the app's name is "Simon Said" and not "Simon Says".
 
-I've hidden a little surprise in the game that triggers after a period of inactivity. See if you can find it!
+I've hidden a little surprise in the game that triggers after... something. See if you can find it!
 
 ##
 Thanks for checking out my project. I had a blast making it and I hope you enjoy playing! Feel free to reach out if you have any questions or suggestions. Now what did Simon say exactly?
