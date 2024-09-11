@@ -21,9 +21,9 @@ Or simply go to [babelyaga.github.io/simon](https://babelyaga.github.io/simon) a
 ## How to Play
 
 1. Hit that "Start" button to kick things off.
-2. Watch and listen to the sequence I'll show you.
+2. Watch and listen to the sequence.
 3. Repeat it back by clicking the colored buttons in the same order.
-4. Get it right, and I'll add another step to the sequence. How far can you go?
+4. Get it right, and I'll add another step to the sequence.?
 5. Make a mistake, and it's game over! But don't worry, you can always try again.
 
 ## Game Features
