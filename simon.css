@@ -54,6 +54,7 @@ body {
   justify-content: center;
   box-sizing: border-box;
   border: 0.5vmin solid #1a1b1a;
+  user-select: none;
 }
 
 .color-button {
@@ -63,6 +64,7 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   aspect-ratio: 1 / 1;
   filter: brightness(100%);
+  user-select: none;
 }
 
 .color-button:hover {
@@ -132,6 +134,7 @@ body {
   gap: 2vmin;
   z-index: 1001;
   transition: transform 0.2s ease-in-out;
+  user-select: none;
 }
 
 .reset-button,
