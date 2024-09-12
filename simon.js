@@ -423,9 +423,9 @@ function playSound(color) {
 }
 
 function flashButton(color) {
+  playSound(color);
   const button = document.querySelector(`.color-button[data-color="${color}"]`);
   button.classList.add("active");
-  playSound(color);
   setTimeout(
     () => button.classList.remove("active"),
     getTimeoutForCurrentLevel()
